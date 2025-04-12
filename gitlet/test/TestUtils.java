@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.PrintStream;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.Permission;
 
 public class TestUtils
@@ -24,6 +28,21 @@ public class TestUtils
             }
         }
         return dir.delete();
+    }
+
+    public static boolean createFile(String path, String content)
+    {
+        Path filePath = Paths.get(path);
+
+        try
+        {
+            Files.write(filePath, content.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static class ConsoleCapture

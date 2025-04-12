@@ -19,18 +19,33 @@ public class RepositoryInitTest
                 fail("Failed to delete existing .gitlet directory.");
             }
         }
-        // Initialize the repository
-        Main.main(new String[] {"init"});
-        // Check if the .gitlet directory exists
-        assertTrue(Repository.GITLET_DIR.exists() && Repository.GITLET_DIR.isDirectory(),
-                   "Failed to create .gitlet directory.");
-        assertTrue(Repository.OBJECTS_DIR.exists() && Repository.OBJECTS_DIR.isDirectory(),
-                   "Failed to create objects directory.");
-        assertTrue(Repository.REFS_DIR.exists() && Repository.REFS_DIR.isDirectory(),
-                   "Failed to create refs directory.");
-        assertTrue(Repository.HEADS_DIR.exists() && Repository.HEADS_DIR.isDirectory(),
-                   "Failed to create heads directory.");
-        assertTrue(Repository.HEAD_FILE.exists() && Repository.HEAD_FILE.isFile(), "Failed to create HEAD file.");
+
+        // Capture exit code
+        TestUtils.ExitCapture exitCapture = new TestUtils.ExitCapture();
+
+        try
+        {
+            // Initialize the repository
+            Main.main(new String[] {"init"});
+            // Check if the .gitlet directory exists
+            assertTrue(Repository.GITLET_DIR.exists() && Repository.GITLET_DIR.isDirectory(),
+                       "Failed to create .gitlet directory.");
+            assertTrue(Repository.OBJECTS_DIR.exists() && Repository.OBJECTS_DIR.isDirectory(),
+                       "Failed to create objects directory.");
+            assertTrue(Repository.REFS_DIR.exists() && Repository.REFS_DIR.isDirectory(),
+                       "Failed to create refs directory.");
+            assertTrue(Repository.HEADS_DIR.exists() && Repository.HEADS_DIR.isDirectory(),
+                       "Failed to create heads directory.");
+            assertTrue(Repository.HEAD_FILE.exists() && Repository.HEAD_FILE.isFile(), "Failed to create HEAD file.");
+        }
+        catch (ExitException e)
+        {
+            fail("Expected not to exit, but actually exited with code: " + e.getExitCode());
+        }
+        finally
+        {
+            exitCapture.destroy();
+        }
     }
 
     @Test public void testInitWithExistingDirectory()
