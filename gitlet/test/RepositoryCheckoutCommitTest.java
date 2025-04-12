@@ -125,8 +125,7 @@ public class RepositoryCheckoutCommitTest {
                 Main.main(new String[]{"checkout", invalidCommitId, "--", "test.txt"});
             } catch (ExitException e) {
 
-                assertTrue(consoleCapture.getOutput().contains("No commit with that id exists."),
-                        "Unexpected error message: " + consoleCapture.getOutput());
+                assertTrue(consoleCapture.getOutput().contains("No commit with that id exists."), "Unexpected error message: " + consoleCapture.getOutput());
                 // Check if the exit code is 0
                 assertEquals(0, e.getExitCode(), "Expected exit code 0, but actually exited with code: " + e.getExitCode());
 
@@ -191,8 +190,7 @@ public class RepositoryCheckoutCommitTest {
                 Main.main(new String[]{"checkout", commitId, "--", "missing.txt"});
             } catch (ExitException e) {
 
-                assertTrue(consoleCapture.getOutput().contains("File does not exist in that commit."),
-                        "Unexpected error message: " + consoleCapture.getOutput());
+                assertTrue(consoleCapture.getOutput().contains("File does not exist in that commit."), "Unexpected error message: " + consoleCapture.getOutput());
                 // Check if the exit code is 0
                 assertEquals(0, e.getExitCode(), "Expected exit code 0, but actually exited with code: " + e.getExitCode());
 

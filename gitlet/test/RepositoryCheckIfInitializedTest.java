@@ -1,22 +1,19 @@
 package gitlet.test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import gitlet.Repository;
 import gitlet.test.TestUtils.ExitCapture.NoExitSecurityManager.ExitException;
 import org.testng.annotations.Test;
 
-public class RepositoryCheckIfInitializedTest
-{
-    @Test public void testExistCheckIfInitialized()
-    {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class RepositoryCheckIfInitializedTest {
+    @Test
+    public void testExistCheckIfInitialized() {
 
         // Check if the .gitlet directory exists
-        if (!Repository.GITLET_DIR.exists())
-        {
+        if (!Repository.GITLET_DIR.exists()) {
             // If it doesn't exist, create it
-            if (!Repository.GITLET_DIR.mkdir())
-            {
+            if (!Repository.GITLET_DIR.mkdir()) {
                 fail("Failed to create .gitlet directory.");
             }
         }
@@ -26,29 +23,23 @@ public class RepositoryCheckIfInitializedTest
 
         // Try to check if initialized
         // Expecting exit code 0
-        try
-        {
+        try {
             Repository.checkIfInitialized();
-        }
-        catch (ExitException e)
-        {
+        } catch (ExitException e) {
             int exitCode = e.getExitCode();
             fail("Expected not to exit, but actually exited with code: " + exitCode);
-        }
-        finally
-        {
+        } finally {
             exitCapture.destroy();
         }
     }
-    @Test public void testNotExistCheckIfInitialized()
-    {
+
+    @Test
+    public void testNotExistCheckIfInitialized() {
 
         // Check if the .gitlet directory exists
-        if (Repository.GITLET_DIR.exists())
-        {
+        if (Repository.GITLET_DIR.exists()) {
             // If it doesn't exist, create it
-            if (!TestUtils.deleteDirectory(Repository.GITLET_DIR))
-            {
+            if (!TestUtils.deleteDirectory(Repository.GITLET_DIR)) {
                 fail("Failed to delete existing .gitlet directory.");
             }
         }
@@ -60,20 +51,15 @@ public class RepositoryCheckIfInitializedTest
 
         // Try to check if initialized
         // Expecting exit code 0
-        try
-        {
+        try {
             Repository.checkIfInitialized();
             fail("Expected exit with code 0, but not actually exited.");
-        }
-        catch (ExitException e)
-        {
+        } catch (ExitException e) {
             int exitCode = e.getExitCode();
             assertTrue(consoleCapture.getOutput().contains("Not in an initialized Gitlet directory."),
-                       "Unexpected error message: " + consoleCapture.getOutput());
+                    "Unexpected error message: " + consoleCapture.getOutput());
             assertEquals(0, exitCode, "Expected exit code 0.");
-        }
-        finally
-        {
+        } finally {
             consoleCapture.destroy();
             exitCapture.destroy();
         }

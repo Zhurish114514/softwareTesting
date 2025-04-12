@@ -1,21 +1,18 @@
 package gitlet.test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import gitlet.Main;
 import gitlet.Repository;
 import gitlet.test.TestUtils.ExitCapture.NoExitSecurityManager.ExitException;
 import org.testng.annotations.Test;
 
-public class RepositoryInitTest
-{
-    @Test public void testNormalInit()
-    {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class RepositoryInitTest {
+    @Test
+    public void testNormalInit() {
         // Remove the .gitlet directory if it exists
-        if (Repository.GITLET_DIR.exists())
-        {
-            if (!TestUtils.deleteDirectory(Repository.GITLET_DIR))
-            {
+        if (Repository.GITLET_DIR.exists()) {
+            if (!TestUtils.deleteDirectory(Repository.GITLET_DIR)) {
                 fail("Failed to delete existing .gitlet directory.");
             }
         }
@@ -23,39 +20,32 @@ public class RepositoryInitTest
         // Capture exit code
         TestUtils.ExitCapture exitCapture = new TestUtils.ExitCapture();
 
-        try
-        {
+        try {
             // Initialize the repository
-            Main.main(new String[] {"init"});
+            Main.main(new String[]{"init"});
             // Check if the .gitlet directory exists
             assertTrue(Repository.GITLET_DIR.exists() && Repository.GITLET_DIR.isDirectory(),
-                       "Failed to create .gitlet directory.");
+                    "Failed to create .gitlet directory.");
             assertTrue(Repository.OBJECTS_DIR.exists() && Repository.OBJECTS_DIR.isDirectory(),
-                       "Failed to create objects directory.");
+                    "Failed to create objects directory.");
             assertTrue(Repository.REFS_DIR.exists() && Repository.REFS_DIR.isDirectory(),
-                       "Failed to create refs directory.");
+                    "Failed to create refs directory.");
             assertTrue(Repository.HEADS_DIR.exists() && Repository.HEADS_DIR.isDirectory(),
-                       "Failed to create heads directory.");
+                    "Failed to create heads directory.");
             assertTrue(Repository.HEAD_FILE.exists() && Repository.HEAD_FILE.isFile(), "Failed to create HEAD file.");
-        }
-        catch (ExitException e)
-        {
+        } catch (ExitException e) {
             fail("Expected not to exit, but actually exited with code: " + e.getExitCode());
-        }
-        finally
-        {
+        } finally {
             exitCapture.destroy();
         }
     }
 
-    @Test public void testInitWithExistingDirectory()
-    {
+    @Test
+    public void testInitWithExistingDirectory() {
         // Check if the .gitlet directory exists
-        if (!Repository.GITLET_DIR.exists())
-        {
+        if (!Repository.GITLET_DIR.exists()) {
             // If it doesn't exist, create it
-            if (!Repository.GITLET_DIR.mkdir())
-            {
+            if (!Repository.GITLET_DIR.mkdir()) {
                 fail("Failed to create .gitlet directory.");
             }
         }
@@ -86,20 +76,15 @@ public class RepositoryInitTest
         //            consoleCapture.destroy();
         //        }
 
-        try
-        {
-            Main.main(new String[] {"init"});
-        }
-        catch (ExitException e)
-        {
+        try {
+            Main.main(new String[]{"init"});
+        } catch (ExitException e) {
             // Check if the error message is as expected
             assertTrue(consoleCapture.getOutput().contains(
-                           "A Gitlet version-control system already exists in the current directory."),
-                       "Unexpected error message: " + consoleCapture.getOutput());
+                            "A Gitlet version-control system already exists in the current directory."),
+                    "Unexpected error message: " + consoleCapture.getOutput());
             assertEquals(0, e.getExitCode(), "Expected exit code 0.");
-        }
-        finally
-        {
+        } finally {
             consoleCapture.destroy();
             exitCapture.destroy();
         }
