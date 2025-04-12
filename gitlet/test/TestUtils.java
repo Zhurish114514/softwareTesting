@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.Permission;
+import java.util.Optional;
 
 public class TestUtils
 {
@@ -43,6 +44,20 @@ public class TestUtils
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static Optional<String> readFile(String path)
+    {
+        Path filePath = Paths.get(path);
+        try
+        {
+            return Optional.of(new String(Files.readAllBytes(filePath)));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     public static class ConsoleCapture
