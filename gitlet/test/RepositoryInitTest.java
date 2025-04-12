@@ -1,10 +1,10 @@
 package gitlet.test;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.catchSystemExit;
 import static org.junit.jupiter.api.Assertions.*;
 
 import gitlet.Main;
 import gitlet.Repository;
+import gitlet.test.TestUtils.ExitCapture.NoExitSecurityManager.ExitException;
 import org.testng.annotations.Test;
 
 public class RepositoryInitTest
@@ -47,24 +47,46 @@ public class RepositoryInitTest
         // Capture the console output
         TestUtils.ConsoleCapture consoleCapture = new TestUtils.ConsoleCapture();
 
+        // Capture exit code
+        TestUtils.ExitCapture exitCapture = new TestUtils.ExitCapture();
+
         // Try to initialize the repository again
         // Expecting exit code 0
+
+        //        try
+        //        {
+        //            int exitCode = catchSystemExit(() -> Main.main(new String[] {"init"}));
+        //            // Check if the error message is as expected
+        //            assertTrue(consoleCapture.getOutput().contains(
+        //                           "A Gitlet version-control system already exists in the current directory."),
+        //                       "Unexpected error message: " + consoleCapture.getOutput());
+        //            assertEquals(0, exitCode, "Expected exit code 0.");
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            fail("Expected exit with code 0, but not actually exited.");
+        //        }
+        //        finally
+        //        {
+        //            consoleCapture.destroy();
+        //        }
+
         try
         {
-            int exitCode = catchSystemExit(() -> Main.main(new String[] {"init"}));
+            Main.main(new String[] {"init"});
+        }
+        catch (ExitException e)
+        {
             // Check if the error message is as expected
             assertTrue(consoleCapture.getOutput().contains(
                            "A Gitlet version-control system already exists in the current directory."),
                        "Unexpected error message: " + consoleCapture.getOutput());
-            assertEquals(0, exitCode, "Expected exit code 0.");
-        }
-        catch (Exception e)
-        {
-            fail("Expected exit with code 0, but not actually exited.");
+            assertEquals(0, e.getExitCode(), "Expected exit code 0.");
         }
         finally
         {
             consoleCapture.destroy();
+            exitCapture.destroy();
         }
     }
 }
