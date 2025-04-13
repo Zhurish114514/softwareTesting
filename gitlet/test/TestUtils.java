@@ -45,6 +45,7 @@ public class TestUtils
         }
         return false;
     }
+
     public static Optional<String> readFile(String path)
     {
         Path filePath = Paths.get(path);
