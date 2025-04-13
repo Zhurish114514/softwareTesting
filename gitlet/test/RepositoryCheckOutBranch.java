@@ -111,7 +111,9 @@ public class RepositoryCheckOutBranch {
         // Add a new file and commit it to the default branch (master)
         TestUtils.createFile("hello.txt", "Hello, world!");
         Main.main(new String[]{"add", "hello.txt"});
+        Main.main(new String[]{"rm", "test.txt"});
         Main.main(new String[]{"commit", "hello.txt added"});
+        TestUtils.deleteFile("test.txt");
         TestUtils.createFile("test.txt", "Hello, world!");
         // Attempt to check out the new branch with uncommitted changes
         TestUtils.ConsoleCapture consoleCapture = new TestUtils.ConsoleCapture();
@@ -122,7 +124,7 @@ public class RepositoryCheckOutBranch {
             fail("Expected System.exit(0) to be called");
         } catch (TestUtils.ExitCapture.NoExitSecurityManager.ExitException e) {
             assertEquals(0, e.getExitCode());
-            assertTrue(consoleCapture.getOutput().contains("You have uncommitted changes."));
+            assertTrue(consoleCapture.getOutput().contains("There is an untracked file in the way; delete it, or add and commit it first."));
         } finally {
             consoleCapture.destroy();
             exitCapture.destroy();

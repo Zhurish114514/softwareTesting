@@ -46,6 +46,19 @@ public class TestUtils
         return false;
     }
 
+    public static boolean deleteFile(String path) {
+        Path filePath = Paths.get(path);
+        try
+        {
+            return Files.deleteIfExists(filePath);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static Optional<String> readFile(String path)
     {
         Path filePath = Paths.get(path);
