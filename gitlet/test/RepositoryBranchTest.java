@@ -16,7 +16,7 @@ public class RepositoryBranchTest {
         Main.main(new String[]{"init"});
         Main.main(new String[]{"branch", "dev"});
 
-        java.io.File branchFile = new java.io.File(Repository.REFS_DIR, "dev");
+        java.io.File branchFile = new java.io.File(Repository.HEADS_DIR, "dev");
         assertTrue(branchFile.exists(), "Branch file should be created.");
     }
 
