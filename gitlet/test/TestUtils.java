@@ -17,9 +17,17 @@ public class TestUtils
     public static void deleteTestFiles() {
         File currentDir = new File(System.getProperty("user.dir"));
         File[] txtFiles = currentDir.listFiles((dir, name) -> name.endsWith(".txt"));
+        File[] stuffFiles = currentDir.listFiles((dir, name) -> name.endsWith(".stuff"));
 
         if (txtFiles != null) {
             for (File file : txtFiles) {
+                if (!file.delete()) {
+                    System.err.println("Failed to delete: " + file.getPath());
+                }
+            }
+        }
+        if (stuffFiles != null) {
+            for (File file : stuffFiles) {
                 if (!file.delete()) {
                     System.err.println("Failed to delete: " + file.getPath());
                 }

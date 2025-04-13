@@ -70,6 +70,8 @@ public class RepositoryLog {
         } finally {
             consoleCapture.destroy();
         }
+        // Clean up test files
+        TestUtils.deleteTestFiles();
     }
 
     private Commit getParentCommit(Commit commit) throws Exception {
