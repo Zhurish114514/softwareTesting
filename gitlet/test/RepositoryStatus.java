@@ -42,6 +42,12 @@ public class RepositoryStatus {
         TestUtils.createFile("random.stuff", "1234143");
         TestUtils.deleteFile("wug3.txt");
         TestUtils.createFile("wug3.txt", "Hello, Gitlet!");
+        TestUtils.deleteFile("wug.txt");
+        TestUtils.deleteFile("wug2.txt");
+        TestUtils.createFile("wug.txt", "Hello, Gitlet!");
+        TestUtils.createFile("wug2.txt", "Hello, Gitlet!");
+        Main.main(new String[]{"add", "wug.txt"});
+        Main.main(new String[]{"add", "wug2.txt"});
         TestUtils.deleteFile("junk.txt");
         Main.main(new String[]{"rm", "goodbye.txt"});
 
@@ -56,6 +62,8 @@ public class RepositoryStatus {
             assertTrue(output.contains("*master"));
             assertTrue(output.contains("other-branch"));
             assertTrue(output.contains("=== Staged Files ==="));
+            assertTrue(output.contains("wug.txt"));
+            assertTrue(output.contains("wug2.txt"));
             assertTrue(output.contains("=== Removed Files ==="));
             assertTrue(output.contains("goodbye.txt"));
             assertTrue(output.contains("=== Modifications Not Staged For Commit ==="));
