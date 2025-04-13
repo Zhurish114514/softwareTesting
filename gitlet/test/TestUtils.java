@@ -1,9 +1,6 @@
 package gitlet.test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +11,51 @@ import java.util.Optional;
 
 public class TestUtils
 {
+    static <T extends Serializable> T readObject(File file,
+                                                 Class<T> expectedClass) {
+        try {
+            ObjectInputStream in =
+                    new ObjectInputStream(new FileInputStream(file));
+            T result = expectedClass.cast(in.readObject());
+            in.close();
+            return result;
+        } catch (IOException | ClassCastException
+                 | ClassNotFoundException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+    }
+    static File join(File first, String... others) {
+        return Paths.get(first.getPath(), others).toFile();
+    }
+    static byte[] readContents(File file) {
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("must be a normal file");
+        }
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+    }
+    public static String sha1(String input) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-1");
+            byte[] result = md.digest(input.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : result) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+    public static String sha1(String input1, String input2) {
+        return sha1(input1 + input2); // 拼接 path + content
+    }
+
+
     public static boolean deleteDirectory(File dir)
     {
         if (dir.isDirectory())
