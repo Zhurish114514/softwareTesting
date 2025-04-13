@@ -60,6 +60,11 @@ public class TestUtils
         return Optional.empty();
     }
 
+    public static boolean fileExists(String file) {
+        Path filePath = Paths.get(file);
+        return Files.exists(filePath);
+    }
+
     public static class ConsoleCapture
     {
         private final PrintStream originalOut = System.out;

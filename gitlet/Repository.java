@@ -51,6 +51,12 @@ public class Repository
     private static Stage addStage;
     private static Stage removeStage;
 
+    private static String getCurrentBranch()
+    {
+        // 读取HEAD文件，获取当前分支的文件路径
+        return readObject(HEAD_FILE, String.class);
+    }
+
     public static void checkCommandLength(String[] args, int length)
     {
         if (args.length != length)
@@ -566,7 +572,6 @@ public class Repository
                             + "delete it, or add and commit it first.");
                     System.exit(0);
                 }
-                System.exit(0);
             }
         }
         // 删除所有在当前分支追踪但不在检出分支的文件
