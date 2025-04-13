@@ -14,6 +14,18 @@ import java.util.Optional;
 
 public class TestUtils
 {
+    public static void deleteTestFiles() {
+        File currentDir = new File(System.getProperty("user.dir"));
+        File[] txtFiles = currentDir.listFiles((dir, name) -> name.endsWith(".txt"));
+
+        if (txtFiles != null) {
+            for (File file : txtFiles) {
+                if (!file.delete()) {
+                    System.err.println("Failed to delete: " + file.getPath());
+                }
+            }
+        }
+    }
     public static boolean deleteDirectory(File dir)
     {
         if (dir.isDirectory())

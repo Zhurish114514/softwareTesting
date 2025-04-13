@@ -5,6 +5,7 @@ import gitlet.Main;
 import gitlet.Repository;
 import org.junit.Test;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -41,6 +42,7 @@ public class RepositoryCheckOutBranch {
             consoleCapture.destroy();
             exitCapture.destroy();
         }
+        TestUtils.deleteTestFiles();
     }
 
     @Test
@@ -86,6 +88,7 @@ public class RepositoryCheckOutBranch {
         // Verify the expected files in the working directory after switching to 'new-branch'
         assertTrue(TestUtils.fileExists("test.txt"), "File 'test.txt' should exist in the working directory.");
         assertFalse("File 'hello.txt' should not exist in the working directory on 'new-branch'.", TestUtils.fileExists("hello.txt"));
+        TestUtils.deleteTestFiles();
     }
 
     @Test
@@ -129,6 +132,7 @@ public class RepositoryCheckOutBranch {
             consoleCapture.destroy();
             exitCapture.destroy();
         }
+        TestUtils.deleteTestFiles();
     }
 
 }
