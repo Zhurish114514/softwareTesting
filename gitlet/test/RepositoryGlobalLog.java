@@ -40,9 +40,11 @@ public class RepositoryGlobalLog {
         Main.main(new String[]{"commit", "yet another commit"});
 
         // Capture and verify log output
+
         TestUtils.ConsoleCapture consoleCapture = new TestUtils.ConsoleCapture();
         try {
-            Main.main(new String[]{"globalLog"});
+
+            Main.main(new String[]{"global-log"});
             String output = consoleCapture.getOutput();
             // Verify log output contains all commit information
             List<String> commitFiles = plainFilenamesIn(OBJECTS_DIR);
