@@ -1,9 +1,6 @@
 package gitlet.test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +11,22 @@ import java.util.Optional;
 
 public class TestUtils
 {
+    static <T extends Serializable> T readObject(File file,
+                                                 Class<T> expectedClass) {
+        try {
+            ObjectInputStream in =
+                    new ObjectInputStream(new FileInputStream(file));
+            T result = expectedClass.cast(in.readObject());
+            in.close();
+            return result;
+        } catch (IOException | ClassCastException
+                 | ClassNotFoundException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
+        }
+    }
+    static File join(File first, String... others) {
+        return Paths.get(first.getPath(), others).toFile();
+    }
     public static void deleteTestFiles() {
         File currentDir = new File(System.getProperty("user.dir"));
         File[] txtFiles = currentDir.listFiles((dir, name) -> name.endsWith(".txt"));

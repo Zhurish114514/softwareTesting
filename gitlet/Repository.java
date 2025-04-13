@@ -395,7 +395,9 @@ public class Repository
         printModificationsNotStaged();
         printUntrackedFiles();
     }
-
+    public static Commit getBlobID(){
+        return lastCommit;
+    }
     private static void printModificationsNotStaged()
     {
         System.out.println("=== Modifications Not Staged For Commit ===");
