@@ -111,7 +111,8 @@ public class RepositoryCheckOutBranch {
         // Add a new file and commit it to the default branch (master)
         TestUtils.createFile("hello.txt", "Hello, world!");
         Main.main(new String[]{"add", "hello.txt"});
-
+        Main.main(new String[]{"commit", "hello.txt added"});
+        TestUtils.createFile("test.txt", "Hello, world!");
         // Attempt to check out the new branch with uncommitted changes
         TestUtils.ConsoleCapture consoleCapture = new TestUtils.ConsoleCapture();
         TestUtils.ExitCapture exitCapture = new TestUtils.ExitCapture();
