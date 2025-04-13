@@ -1080,40 +1080,63 @@ public class Repository
         return allFiles;
     }
 
-    private static String findSplitPoint(Commit targetCommit)
-    {
-        // 首先按bfs的方式遍历当前分支的所有commit，将所有commit的id存入set中
-        lastCommit = readLastCommit();
-        Queue<String> commitQueue = new LinkedList<>();
+//    private static String findSplitPoint(Commit targetCommit)
+//    {
+//        // 首先按bfs的方式遍历当前分支的所有commit，将所有commit的id存入set中
+//        lastCommit = readLastCommit();
+//        Queue<String> commitQueue = new LinkedList<>();
+//        Set<String> curBranchCommits = new HashSet<>();
+//        commitQueue.add(lastCommit.getCommitID());
+//        while (!commitQueue.isEmpty())
+//        {
+//            String curCommitId = commitQueue.poll();
+//            curBranchCommits.add(curCommitId);
+//            File curCommitFile = join(OBJECTS_DIR, curCommitId);
+//            Commit curCommit = readObject(curCommitFile, Commit.class);
+//            for (String parent : curCommit.getParents())
+//            {
+//                commitQueue.add(parent);
+//            }
+//        }
+//        // 然后按bfs的方式遍历目标分支的所有commit，如果遇到当前分支的commit，返回
+//        commitQueue.add(targetCommit.getCommitID());
+//        while (!commitQueue.isEmpty())
+//        {
+//            String assignedBranchCommitId = commitQueue.poll();
+//            if (curBranchCommits.contains(assignedBranchCommitId))
+//            {
+//                return assignedBranchCommitId;
+//            }
+//            File curCommitFile = join(OBJECTS_DIR, assignedBranchCommitId);
+//            Commit curCommit = readObject(curCommitFile, Commit.class);
+//            for (String parent : curCommit.getParents())
+//            {
+//                commitQueue.add(parent);
+//            }
+//        }
+//        return null;
+//    }
+    public static String findSplitPoint(Commit targetCommit) {
+        //找到两个分支的最近公共祖先
+        //首先将当前分支倒序遍历加入哈希表
+        //在这里遍历两个分支时为了方便，使用了全局变量lastCommit(全局变量lastCommit本来是指向当前分支的最新commit)
+        //使用后切换回去
         Set<String> curBranchCommits = new HashSet<>();
-        commitQueue.add(lastCommit.getCommitID());
-        while (!commitQueue.isEmpty())
-        {
-            String curCommitId = commitQueue.poll();
-            curBranchCommits.add(curCommitId);
-            File curCommitFile = join(OBJECTS_DIR, curCommitId);
-            Commit curCommit = readObject(curCommitFile, Commit.class);
-            for (String parent : curCommit.getParents())
-            {
-                commitQueue.add(parent);
+        for (lastCommit = readLastCommit();
+             hasParentCommit(lastCommit); moveLastToPreviousCommit()) {
+            curBranchCommits.add(lastCommit.getCommitID());
+        }
+        curBranchCommits.add(lastCommit.getCommitID());
+        //然后将目标分支倒序遍历，如果遇到哈希表中的commit，返回该commit
+        //这里更改了lastCommit
+        for (lastCommit = targetCommit; hasParentCommit(lastCommit); moveLastToPreviousCommit()) {
+            String curCommitId = lastCommit.getCommitID();
+            if (curBranchCommits.contains(curCommitId)) {
+                return curCommitId;
             }
         }
-        // 然后按bfs的方式遍历目标分支的所有commit，如果遇到当前分支的commit，返回
-        commitQueue.add(targetCommit.getCommitID());
-        while (!commitQueue.isEmpty())
-        {
-            String assignedBranchCommitId = commitQueue.poll();
-            if (curBranchCommits.contains(assignedBranchCommitId))
-            {
-                return assignedBranchCommitId;
-            }
-            File curCommitFile = join(OBJECTS_DIR, assignedBranchCommitId);
-            Commit curCommit = readObject(curCommitFile, Commit.class);
-            for (String parent : curCommit.getParents())
-            {
-                commitQueue.add(parent);
-            }
-        }
-        return null;
+        String initialCommitId = lastCommit.getCommitID();
+        lastCommit = readLastCommit();  //将lastCommit调整回指向当前分支的最新commit
+        return initialCommitId;
     }
 }
