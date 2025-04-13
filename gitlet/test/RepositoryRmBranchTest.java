@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RepositoryRmBranch {
+public class RepositoryRmBranchTest {
     @Test
     public static void testNormalRmBranch() {
         // Remove the .gitlet directory if it exists

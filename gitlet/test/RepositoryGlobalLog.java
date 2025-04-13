@@ -6,16 +6,16 @@ import gitlet.Repository;
 import org.junit.Test;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 import static gitlet.Repository.*;
 import static org.junit.Assert.*;
 
-public class RepositoryLog {
+public class RepositoryGlobalLog {
     @Test
-    public void testLog() {
+    public void testGlobalLog() {
         // Clean up existing repository
         if (Repository.GITLET_DIR.exists()) {
             if (!TestUtils.deleteDirectory(Repository.GITLET_DIR)) {
@@ -40,30 +40,41 @@ public class RepositoryLog {
         Main.main(new String[]{"commit", "yet another commit"});
 
         // Capture and verify log output
+
         TestUtils.ConsoleCapture consoleCapture = new TestUtils.ConsoleCapture();
         try {
-            Main.main(new String[]{"log"});
+
+            Main.main(new String[]{"global-log"});
             String output = consoleCapture.getOutput();
-
             // Verify log output contains all commit information
-            Commit lastCommit = readLastCommit();
-            while (lastCommit != null) {
-                assertTrue("Log missing commit message: " + lastCommit.getMessage(),
-                        output.contains(lastCommit.getMessage()));
-                assertTrue("Log missing commit ID: " + lastCommit.getCommitID(),
-                        output.contains("commit " + lastCommit.getCommitID()));
-                assertTrue("Log missing timestamp: " + lastCommit.getTimeStamp(),
-                        output.contains("Date: " + lastCommit.getTimeStamp()));
-
-                if (lastCommit.isMergeCommit()) {
-                    assertTrue("Log missing merge info",
-                            output.contains("Merge: " +
-                                    lastCommit.getParentCommitIDs().get(0).substring(0, 7) + " " +
-                                    lastCommit.getParentCommitIDs().get(1).substring(0, 7)));
+            List<String> commitFiles = plainFilenamesIn(OBJECTS_DIR);
+            {
+                if (commitFiles == null) {
+                    fail("No commit files found in the objects directory.");
                 }
-
-                // Move to parent commit
-                lastCommit = getParentCommit(lastCommit);
+                for (String idString : commitFiles)
+                {
+                    try
+                    {
+                        File commitFile = join(OBJECTS_DIR, idString);
+                        Commit commit = readObject(commitFile, Commit.class);
+                        assertTrue("Log missing commit message: " + commit.getMessage(),
+                                output.contains(commit.getMessage()));
+                        assertTrue("Log missing commit ID: " + commit.getCommitID(),
+                                output.contains("commit " + commit.getCommitID()));
+                        assertTrue("Log missing timestamp: " + commit.getTimeStamp(),
+                                output.contains("Date: " + commit.getTimeStamp()));
+                        if (commit.isMergeCommit()) {
+                            assertTrue("Log missing merge info",
+                                    output.contains("Merge: " +
+                                            commit.getParentCommitIDs().get(0).substring(0, 7) + " " +
+                                            commit.getParentCommitIDs().get(1).substring(0, 7)));
+                        }
+                    }
+                    catch (IllegalArgumentException ignored)
+                    {
+                    }
+                }
             }
         } catch (Exception e) {
             fail("Test failed with exception: " + e.getMessage());
@@ -74,14 +85,24 @@ public class RepositoryLog {
         TestUtils.deleteTestFiles();
     }
 
-    private Commit getParentCommit(Commit commit) throws Exception {
-        if (commit.getParents().isEmpty()) {
+    static List<String> plainFilenamesIn(File dir) {
+        String[] files = dir.list(PLAIN_FILES);
+        if (files == null) {
             return null;
+        } else {
+            Arrays.sort(files);
+            return Arrays.asList(files);
         }
-        String parentID = commit.getParents().get(0);
-        File parentFile = join(OBJECTS_DIR, parentID);
-        return (Commit) readObject(parentFile, Commit.class);
     }
+
+    private static final FilenameFilter PLAIN_FILES =
+            new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return new File(dir, name).isFile();
+                }
+            };
+
 
     static File join(File first, String... others) {
         return Paths.get(first.getPath(), others).toFile();
