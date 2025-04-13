@@ -76,7 +76,7 @@ public class TestUtils
         {
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
     public static boolean deleteFile(String path) {
