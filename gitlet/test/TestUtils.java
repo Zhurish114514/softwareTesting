@@ -12,17 +12,12 @@ import java.nio.file.StandardOpenOption;
 import java.security.Permission;
 import java.util.Optional;
 
-public class TestUtils
-{
-    public static boolean deleteDirectory(File dir)
-    {
-        if (dir.isDirectory())
-        {
+public class TestUtils {
+    public static boolean deleteDirectory(File dir) {
+        if (dir.isDirectory()) {
             File[] children = dir.listFiles();
-            if (children != null)
-            {
-                for (File child : children)
-                {
+            if (children != null) {
+                for (File child : children) {
                     if (!deleteDirectory(child))
                         return false;
                 }
@@ -31,30 +26,22 @@ public class TestUtils
         return dir.delete();
     }
 
-    public static boolean createFile(String path, String content)
-    {
+    public static boolean createFile(String path, String content) {
         Path filePath = Paths.get(path);
 
-        try
-        {
+        try {
             Files.write(filePath, content.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    public static Optional<String> readFile(String path)
-    {
+    public static Optional<String> readFile(String path) {
         Path filePath = Paths.get(path);
-        try
-        {
+        try {
             return Optional.of(new String(Files.readAllBytes(filePath)));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return Optional.empty();
@@ -65,350 +52,297 @@ public class TestUtils
         return Files.exists(filePath);
     }
 
-    public static class ConsoleCapture
-    {
+
+    public static class ConsoleCapture {
         private final PrintStream originalOut = System.out;
         private final PrintStream originalErr = System.err;
         private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
-        public ConsoleCapture()
-        {
+        public ConsoleCapture() {
             System.setOut(new PrintStream(outContent));
             System.setErr(new PrintStream(errContent));
         }
 
-        public String getOutput()
-        {
+        public String getOutput() {
             return outContent.toString();
         }
 
-        public String getError()
-        {
+        public String getError() {
             return errContent.toString();
         }
 
-        public void refreshOutput()
-        {
+        public void refreshOutput() {
             outContent.reset();
         }
 
-        public void refreshError()
-        {
+        public void refreshError() {
             errContent.reset();
         }
 
-        public void refresh()
-        {
+        public void refresh() {
             refreshOutput();
             refreshError();
         }
 
-        public void destroy()
-        {
+        public void destroy() {
             System.setOut(originalOut);
             System.setErr(originalErr);
-            try
-            {
+            try {
                 outContent.close();
                 errContent.close();
-            }
-            catch (Exception ignored)
-            {
+            } catch (Exception ignored) {
             }
         }
     }
 
-    public static String captureOutput(Runnable runnable)
-    {
+    public static String captureOutput(Runnable runnable) {
         PrintStream originalOut = System.out;
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
-        try
-        {
+        try {
             runnable.run();
             return outContent.toString();
-        }
-        finally
-        {
+        } finally {
             System.setOut(originalOut);
-            try
-            {
+            try {
                 outContent.close();
-            }
-            catch (Exception ignored)
-            {
+            } catch (Exception ignored) {
             }
         }
     }
 
-    public static String captureError(Runnable runnable)
-    {
+    public static String captureError(Runnable runnable) {
         PrintStream originalErr = System.err;
         ByteArrayOutputStream errContent = new ByteArrayOutputStream();
         System.setErr(new PrintStream(errContent));
-        try
-        {
+        try {
             runnable.run();
             return errContent.toString();
-        }
-        finally
-        {
+        } finally {
             System.setErr(originalErr);
-            try
-            {
+            try {
                 errContent.close();
-            }
-            catch (Exception ignored)
-            {
+            } catch (Exception ignored) {
             }
         }
     }
 
-    public static class ExitCapture
-    {
-        public static class NoExitSecurityManager extends SecurityManager
-        {
+    public static class ExitCapture {
+        public static class NoExitSecurityManager extends SecurityManager {
             private final SecurityManager originalSecurityManager;
-            public NoExitSecurityManager()
-            {
+
+            public NoExitSecurityManager() {
                 this.originalSecurityManager = System.getSecurityManager();
             }
 
-            public static class ExitException extends SecurityException
-            {
+            public static class ExitException extends SecurityException {
                 final int exitCode;
-                public ExitException(int status)
-                {
+
+                public ExitException(int status) {
                     super("Exit with status: " + status);
                     this.exitCode = status;
                 }
-                public int getExitCode()
-                {
+
+                public int getExitCode() {
                     return exitCode;
                 }
             }
-            @Override public void checkExit(int status)
-            {
+
+            @Override
+            public void checkExit(int status) {
                 throw new ExitException(status);
             }
 
-            public Object getSecurityContext()
-            {
+            @Override
+            public Object getSecurityContext() {
                 return this.originalSecurityManager == null ? super.getSecurityContext()
-                                                            : this.originalSecurityManager.getSecurityContext();
+                        : this.originalSecurityManager.getSecurityContext();
             }
 
-            public void checkPermission(Permission perm)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPermission(Permission perm) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPermission(perm);
                 }
             }
 
-            public void checkPermission(Permission perm, Object context)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPermission(Permission perm, Object context) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPermission(perm, context);
                 }
             }
 
-            public void checkCreateClassLoader()
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkCreateClassLoader() {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkCreateClassLoader();
                 }
             }
 
-            public void checkAccess(Thread t)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkAccess(Thread t) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkAccess(t);
                 }
             }
 
-            public void checkAccess(ThreadGroup g)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkAccess(ThreadGroup g) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkAccess(g);
                 }
             }
 
-            public void checkExec(String cmd)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkExec(String cmd) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkExec(cmd);
                 }
             }
 
-            public void checkLink(String lib)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkLink(String lib) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkLink(lib);
                 }
             }
 
-            public void checkRead(FileDescriptor fd)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkRead(FileDescriptor fd) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkRead(fd);
                 }
             }
 
-            public void checkRead(String file)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkRead(String file) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkRead(file);
                 }
             }
 
-            public void checkRead(String file, Object context)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkRead(String file, Object context) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkRead(file, context);
                 }
             }
 
-            public void checkWrite(FileDescriptor fd)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkWrite(FileDescriptor fd) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkWrite(fd);
                 }
             }
 
-            public void checkWrite(String file)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkWrite(String file) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkWrite(file);
                 }
             }
 
-            public void checkDelete(String file)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkDelete(String file) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkDelete(file);
                 }
             }
 
-            public void checkConnect(String host, int port)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkConnect(String host, int port) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkConnect(host, port);
                 }
             }
 
-            public void checkConnect(String host, int port, Object context)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkConnect(String host, int port, Object context) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkConnect(host, port, context);
                 }
             }
 
-            public void checkListen(int port)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkListen(int port) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkListen(port);
                 }
             }
 
-            public void checkAccept(String host, int port)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkAccept(String host, int port) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkAccept(host, port);
                 }
             }
 
-            public void checkMulticast(InetAddress maddr)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkMulticast(InetAddress maddr) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkMulticast(maddr);
                 }
             }
 
-            public void checkPropertiesAccess()
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPropertiesAccess() {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPropertiesAccess();
                 }
             }
 
-            public void checkPropertyAccess(String key)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPropertyAccess(String key) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPropertyAccess(key);
                 }
             }
 
-            public void checkPrintJobAccess()
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPrintJobAccess() {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPrintJobAccess();
                 }
             }
 
-            public void checkPackageAccess(String pkg)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPackageAccess(String pkg) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPackageAccess(pkg);
                 }
             }
 
-            public void checkPackageDefinition(String pkg)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkPackageDefinition(String pkg) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkPackageDefinition(pkg);
                 }
             }
 
-            public void checkSetFactory()
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkSetFactory() {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkSetFactory();
                 }
             }
 
-            public void checkSecurityAccess(String target)
-            {
-                if (this.originalSecurityManager != null)
-                {
+            @Override
+            public void checkSecurityAccess(String target) {
+                if (this.originalSecurityManager != null) {
                     this.originalSecurityManager.checkSecurityAccess(target);
                 }
             }
         }
 
-        public ExitCapture()
-        {
+        public ExitCapture() {
             System.setSecurityManager(new NoExitSecurityManager());
         }
-        public void destroy()
-        {
+
+        public void destroy() {
             SecurityManager sm = System.getSecurityManager();
-            if (sm instanceof NoExitSecurityManager)
-            {
+            if (sm instanceof NoExitSecurityManager) {
                 System.setSecurityManager(null);
             }
         }
