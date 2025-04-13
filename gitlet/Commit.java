@@ -101,7 +101,7 @@ public class Commit implements Serializable {
         return this.parents;
     }
 
-    public void printCommit() {
+    void printCommit() {
         //按照规定要求，对于mergeCommit输出格式与普通commit(单parent)不同
         if (this.parents.size() == 2) {
             printMergeCommit();
@@ -109,6 +109,10 @@ public class Commit implements Serializable {
         } else {
             printSingleCommit();
         }
+    }
+
+    public String getTimeStamp() {
+        return this.timeStamp;
     }
 
     private void printSingleCommit() {
@@ -131,5 +135,13 @@ public class Commit implements Serializable {
 
     public String getMessage() {
         return this.message;
+    }
+
+    public boolean isMergeCommit() {
+        return this.parents.size() == 2;
+    }
+
+    public List<String> getParentCommitIDs() {
+        return this.parents;
     }
 }

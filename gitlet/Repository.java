@@ -51,6 +51,12 @@ public class Repository
     private static Stage addStage;
     private static Stage removeStage;
 
+    private static String getCurrentBranch()
+    {
+        // 读取HEAD文件，获取当前分支的文件路径
+        return readObject(HEAD_FILE, String.class);
+    }
+
     public static void checkCommandLength(String[] args, int length)
     {
         if (args.length != length)
@@ -176,7 +182,7 @@ public class Repository
         return new Stage();
     }
 
-    private static Commit readLastCommit()
+    public static Commit readLastCommit()
     {
         // 读取之前最新的commit:首先读取HEAD文件，获取当前分支的文件路径，然后读取该文件，获取最新的commitID
         String branchName = readObject(HEAD_FILE, String.class); // HEAD文件获取分支名
@@ -309,7 +315,7 @@ public class Repository
         lastCommit.printCommit(); // 打印initialCommit
     }
 
-    private static void moveLastToPreviousCommit()
+    public  static void moveLastToPreviousCommit()
     {
         // 这里是通过lastCommit全局变量来方便处理，真正的分支lastCommit是通过HEAD文件来获取的，是不变的
         String parentID = lastCommit.getParents().get(0);
@@ -317,7 +323,7 @@ public class Repository
         lastCommit = readObject(parentFile, Commit.class);
     }
 
-    private static boolean hasParentCommit(Commit curCommit)
+    public static boolean hasParentCommit(Commit curCommit)
     {
         return !curCommit.getParents().isEmpty();
     }
@@ -566,7 +572,6 @@ public class Repository
                             + "delete it, or add and commit it first.");
                     System.exit(0);
                 }
-                System.exit(0);
             }
         }
         // 删除所有在当前分支追踪但不在检出分支的文件
