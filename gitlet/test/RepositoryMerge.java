@@ -93,5 +93,7 @@ public class RepositoryMerge {
         assertFalse(TestUtils.fileExists("f.txt"));
         assertTrue(contentG.contains("Gitlet!"));
         assertTrue(contentH.contains("Hello, Gitlet!"));
+        TestUtils.deleteTestFiles();
+
     }
 }
